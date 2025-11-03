@@ -1,0 +1,12 @@
+# build output
+build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+
+# Editors / IDEs
+.vscode/

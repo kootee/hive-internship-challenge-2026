@@ -18,6 +18,7 @@ bool Player::init()
     if (!m_pSprite)
         return false;
 
+    m_origin = sf::Vector2f(300, 350);
     m_rotation = sf::degrees(0);
     sf::FloatRect localBounds = m_pSprite->getLocalBounds();
     m_pSprite->setOrigin({localBounds.size.x / 2.0f, localBounds.size.y / 2.0f});
@@ -30,18 +31,29 @@ bool Player::init()
 
 void Player::update(float dt)
 {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)
+        && !m_isJumping)
     {
-        m_isJumping = true;
+        if (m_position.y <= 360 && m_position.y >= 340)
+            m_isJumping = true;
+        else 
+            m_isJumping = false;
     }
 
-    if (m_position.y < 600)
-        m_isJumping = false;
-
     if (m_isJumping)
+    {
+        if (m_position.y < 50)
+        {
+            m_isJumping = false;
+            return;
+        }
         m_position.y -= 200 * dt;
-    else if (!m_isJumping && m_position.y < 800)
-        m_position.y += 200 * dt;
+    }
+    else
+    {
+        if (m_position.y < 350)
+            m_position.y += 200 * dt;
+    }
 }
 
 void Player::render(sf::RenderTarget& target) const
