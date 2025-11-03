@@ -29,10 +29,12 @@ bool Player::init()
 	m_collisionRadius = collisionRadius;
 
 	// Initialize jump members
+	m_isJumping = false;
+	m_onPlatform = false;
 	m_jumpSpeed = 0.0f;
 	m_jumpCeiling = 0.0f;
 	m_jumpDx = 0.0f;
-	m_onPlatform = false;
+	m_prevSpaceDown = false;
 
 	return true;
 }
@@ -43,7 +45,7 @@ void Player::update(float dt)
 
 	if (spaceDown && !m_prevSpaceDown)
 	{
-		onJumpPressed(); // setup jump values
+		onJumpPressed();
 	}
 	m_prevSpaceDown = spaceDown;
 
@@ -55,21 +57,31 @@ void Player::update(float dt)
 		if (m_position.y <= m_jumpCeiling)
 		{
 			m_isJumping = false;
+			m_rotation = sf::degrees(45);
 			return;
 		}
 	}
 	else
 	{
-		if (m_position.y < 350.0f) // check for collision with ground instead
+		// Calculate new landing position using delta X
+		float landingYpos = m_position.x + (m_origin.y - m_origin.x);
+
+		if (m_position.y < landingYpos) // Keep falling
 		{
 			m_position.y += m_jumpSpeed * dt;
-			if (m_position.y > 350.0f)
-				m_position.y = 350.0f;
 		}
-		else
+		else // Land
 		{
-			m_rotation = sf::degrees(45);
-			// slide back
+			if (m_origin.x < m_position.x) // Slide back
+			{
+				m_position.x -= 400 * dt;
+				m_position.y -= 400 * dt;
+			}
+			else // Reset original position
+			{
+				m_position.x = m_origin.x;
+				m_position.y = m_origin.y;
+			}
 		}
 	}
 }
@@ -88,7 +100,7 @@ void Player::onJumpPressed()
 			m_jumpSpeed = 1000;
 			m_jumpCeiling = 50;
 			m_onPlatform = false;
-			m_jumpDx = 200;
+			m_jumpDx = 400;
 		}
 		else
 		{

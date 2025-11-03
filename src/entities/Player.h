@@ -22,20 +22,19 @@ public:
     void update(float dt) override;
     void render(sf::RenderTarget& target) const override;
     void onJumpPressed();
-    void resetJump();
 
     bool checkRectCollision(const sf::RectangleShape& rect);
     void setPlatformStatus(bool status);
     bool onPlatform();
     
-    protected:
+protected:
     sf::Vector2f m_origin;
 
-    // jump state
+    // jump state member values
     bool m_onPlatform;
-    bool m_isJumping = false;
-    bool m_prevSpaceDown = false;
-    float m_jumpSpeed = 0.0f;
-    float m_jumpCeiling = 0.0f;
-    float m_jumpDx = 0.0f;
+    bool m_isJumping;
+    float m_jumpSpeed;
+    float m_jumpCeiling;
+    float m_jumpDx;
+    bool m_prevSpaceDown;
 };
