@@ -25,8 +25,8 @@ bool Enemy::init()
 
 void Enemy::update(float dt)
 {
-    m_position.x -= 200 * dt;
-    m_position.y -= 200 * dt;
+    m_position.x -= 400 * dt;
+    m_position.y -= 400 * dt;
 }
 
 void Enemy::render(sf::RenderTarget& target) const

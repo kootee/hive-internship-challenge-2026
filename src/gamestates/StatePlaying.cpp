@@ -6,6 +6,9 @@
 #include <iostream>
 #include <cmath>
 #include <SFML/Graphics/RenderTarget.hpp>
+#include "../Constants.h"
+#include <cstdlib>
+#include <algorithm>
 
 StatePlaying::StatePlaying(StateStack& stateStack)
     : m_stateStack(stateStack)
@@ -54,7 +57,15 @@ void StatePlaying::update(float dt)
 
     // Player and  slope update
     m_pPlayer->update(dt);
-    m_slope->update(dt);
+    updatePlatforms(dt);
+
+    // Platform spawner
+    m_timeUntilPlatformSpawn -= dt;
+    if (m_timeUntilPlatformSpawn <= 0.0f)
+    {
+        spawnPlatform();
+        m_timeUntilPlatformSpawn = platformSpawnInterval;
+    }
 
     for (const std::unique_ptr<Enemy>& pEnemy : m_enemies)
     {
@@ -67,7 +78,6 @@ void StatePlaying::update(float dt)
     {
         float distance = (m_pPlayer->getPosition() - pEnemy->getPosition()).lengthSquared();
         float minDistance = std::pow(Player::collisionRadius + pEnemy->getCollisionRadius(), 2.0f);
-        //const sf::Vector2f playerPosition = m_pPlayer->getPosition();
 
         if (distance <= minDistance)
         {
@@ -76,7 +86,6 @@ void StatePlaying::update(float dt)
         }
     }
 
-    // End Playing State on player death
     if (playerDied)
         m_stateStack.popDeferred();
 }
@@ -84,8 +93,44 @@ void StatePlaying::update(float dt)
 void StatePlaying::render(sf::RenderTarget& target) const
 {
     target.draw(m_ground);
-    target.draw(m_slope->getTerrainVertices()); // draw terrain
+
+    for (const sf::RectangleShape& platform : m_platforms)
+        target.draw(platform);
     for (const std::unique_ptr<Enemy>& pEnemy : m_enemies)
         pEnemy->render(target);
     m_pPlayer->render(target);
+}
+
+void StatePlaying::spawnPlatform()
+{
+    const float width = 120.0f;
+    const float height = 24.0f;
+    sf::RectangleShape platform({width, height});
+    platform.setFillColor(sf::Color::Green);
+
+    platform.setPosition(sf::Vector2f(974, 1024));
+
+    m_platforms.push_back(std::move(platform));
+}
+
+void StatePlaying::updatePlatforms(float dt)
+{
+    if (m_platforms.empty())
+        return;
+
+    float dx = 200 * dt;
+    float dy = 200 * dt;
+
+    for (auto& platform : m_platforms)
+    {
+        platform.move(sf::Vector2f(-dx, -dy));
+    }
+
+    for (auto it = m_platforms.begin(); it != m_platforms.end();)
+    {
+        if ((it->getPosition().x + it->getSize().x) < -50.0f)
+            it = m_platforms.erase(it);
+        else
+            ++it;
+    }
 }

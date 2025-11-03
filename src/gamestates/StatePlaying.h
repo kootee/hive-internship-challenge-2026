@@ -22,14 +22,18 @@ public:
 private:
     static constexpr const float enemySpawnInterval = 2.0f;
     float m_timeUntilEnemySpawn = enemySpawnInterval;
+    static constexpr const float platformSpawnInterval = 3.0f;
+    float m_timeUntilPlatformSpawn = platformSpawnInterval;
 
     StateStack& m_stateStack;
     std::unique_ptr<Player> m_pPlayer;
     std::vector<std::unique_ptr<Enemy>> m_enemies;
     std::vector<sf::RectangleShape>     m_platforms;
-    sf::RectangleShape m_ground;
+    sf::RectangleShape                  m_ground;
     std::unique_ptr<Slope>              m_slope;
     bool m_hasPauseKeyBeenReleased = true;
 
     void updateCollisions();
+    void spawnPlatform();
+    void updatePlatforms(float dt);
 };

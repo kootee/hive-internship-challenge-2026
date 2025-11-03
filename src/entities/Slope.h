@@ -11,7 +11,6 @@ class Slope : public sf::Drawable
 {
 	private:
 		std::deque<sf::Vector2f>	_terrainPts;
-		sf::Vector2f				_lastPoint;
 		sf::VertexArray				_terrainVertices;
 
 	public:
