@@ -3,7 +3,6 @@
 #include "IState.h"
 #include "entities/Player.h"
 #include "entities/Enemy.h"
-#include "entities/Slope.h"
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/Graphics/Text.hpp>
@@ -30,10 +29,8 @@ private:
     std::vector<std::unique_ptr<Enemy>> m_enemies;
     std::vector<sf::RectangleShape>     m_platforms;
     sf::RectangleShape                  m_ground;
-    std::unique_ptr<Slope>              m_slope;
     bool m_hasPauseKeyBeenReleased = true;
 
-    void updateCollisions();
     void spawnPlatform();
     void updatePlatforms(float dt);
 };

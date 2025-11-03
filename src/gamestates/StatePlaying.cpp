@@ -27,8 +27,6 @@ bool StatePlaying::init()
         return false;
     m_pPlayer->setPosition(sf::Vector2f(300, 350));
 
-    m_slope = std::make_unique<Slope>();
-
     return true;
 }
 
@@ -55,7 +53,18 @@ void StatePlaying::update(float dt)
         m_stateStack.push<StatePaused>();
     }
 
-    // Player and  slope update
+    if (!m_pPlayer->onPlatform())
+    {
+        for (auto it : m_platforms)
+        {
+            bool playerOnPlatform = m_pPlayer->checkRectCollision(it);
+            if (playerOnPlatform)
+            {
+                m_pPlayer->setPlatformStatus(true);
+                break;
+            }
+        }
+    }
     m_pPlayer->update(dt);
     updatePlatforms(dt);
 
@@ -103,8 +112,8 @@ void StatePlaying::render(sf::RenderTarget& target) const
 
 void StatePlaying::spawnPlatform()
 {
-    const float width = 120.0f;
-    const float height = 24.0f;
+    const float width = PlatformWidth;
+    const float height = PlatformHeight;
     sf::RectangleShape platform({width, height});
     platform.setFillColor(sf::Color::Green);
 

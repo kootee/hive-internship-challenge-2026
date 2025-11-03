@@ -3,6 +3,7 @@
 #include <memory>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics.hpp>
 
 namespace sf { class RenderTarget; };
 
@@ -23,6 +24,8 @@ public:
     void setRotation(const sf::Angle& rotation) { m_rotation = rotation; };
 
     float getCollisionRadius() { return m_collisionRadius; }
+
+    bool checkPlatformCollision(const sf::RectangleShape& rect);
 
     int getHealth() const { return m_health; }
     void setHealth(int health) { m_health = health; }
