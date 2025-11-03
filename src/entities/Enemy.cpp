@@ -6,7 +6,7 @@
 
 bool Enemy::init()
 {
-    const sf::Texture* pTexture = ResourceManager::getOrLoadTexture("enemy.png");
+    const sf::Texture* pTexture = ResourceManager::getOrLoadTexture("tree.png");
     if (pTexture == nullptr)
         return false;
 

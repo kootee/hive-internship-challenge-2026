@@ -6,10 +6,12 @@
 #include <iostream>
 #include <cmath>
 #include <SFML/Graphics/RenderTarget.hpp>
-#include "../Constants.h"
 #include <cstdlib>
 #include <algorithm>
 #include <random>
+
+const float PlatformHeight = 24.0f;
+const float PlatformWidth = 120.0f;
 
 StatePlaying::StatePlaying(StateStack& stateStack)
 	: m_stateStack(stateStack)
@@ -51,6 +53,14 @@ void StatePlaying::update(float dt)
 			m_enemies.push_back(std::move(pEnemy));
 	}
 
+	// Platform spawn
+	m_timeUntilPlatformSpawn -= dt;
+	if (m_timeUntilPlatformSpawn <= 0.0f)
+	{
+		spawnPlatform();
+		m_timeUntilPlatformSpawn = platformSpawnInterval;
+	}
+	
 	// Pause
 	bool isPauseKeyPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape);
 	m_hasPauseKeyBeenReleased |= !isPauseKeyPressed;
@@ -61,28 +71,17 @@ void StatePlaying::update(float dt)
 	}
 
 	// Player
-	if (!m_pPlayer->onPlatform())
+	m_pPlayer->setPlatformStatus(false);
+	for (auto it : m_platforms)
 	{
-		for (auto it : m_platforms)
+		if (m_pPlayer->checkRectCollision(it))
 		{
-			bool playerOnPlatform = m_pPlayer->checkRectCollision(it);
-			if (playerOnPlatform)
-			{
-				m_pPlayer->setPlatformStatus(true);
-				break;
-			}
+			m_pPlayer->setPlatformStatus(true);
+			break;
 		}
 	}
 	m_pPlayer->update(dt);
 	updatePlatforms(dt);
-
-	// Platform
-	m_timeUntilPlatformSpawn -= dt;
-	if (m_timeUntilPlatformSpawn <= 0.0f)
-	{
-		spawnPlatform();
-		m_timeUntilPlatformSpawn = platformSpawnInterval;
-	}
 
 	for (const std::unique_ptr<Enemy>& pEnemy : m_enemies)
 	{
@@ -123,10 +122,13 @@ void StatePlaying::spawnPlatform()
 	const float width = PlatformWidth;
 	const float height = PlatformHeight;
 	sf::RectangleShape platform({width, height});
-	platform.setFillColor(sf::Color::Green);
-
+	const sf::Texture* pTexture = ResourceManager::getOrLoadTexture("bark.png");
+	platform.setTexture(pTexture);
+	if (pTexture == nullptr)
+	{
+		platform.setFillColor(sf::Color(150, 75, 0));
+	}
 	platform.setPosition(sf::Vector2f(974, 1024));
-
 	m_platforms.push_back(std::move(platform));
 }
 
@@ -139,9 +141,7 @@ void StatePlaying::updatePlatforms(float dt)
 	float dy = 200 * dt;
 
 	for (auto& platform : m_platforms)
-	{
 		platform.move(sf::Vector2f(-dx, -dy));
-	}
 
 	for (auto it = m_platforms.begin(); it != m_platforms.end();)
 	{

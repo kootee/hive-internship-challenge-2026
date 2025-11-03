@@ -1,9 +1,7 @@
 #include "Player.h"
 #include "ResourceManager.h"
-#include "Constants.h"
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Sprite.hpp>
-#include <SFML/Graphics.hpp>
 #include <cmath>
 
 Player::Player()
@@ -35,6 +33,7 @@ bool Player::init()
 	m_jumpCeiling = 0.0f;
 	m_jumpDx = 0.0f;
 	m_prevSpaceDown = false;
+	m_landingYPos = m_origin.y;
 
 	return true;
 }
@@ -57,6 +56,7 @@ void Player::update(float dt)
 		if (m_position.y <= m_jumpCeiling)
 		{
 			m_isJumping = false;
+			m_onPlatform = false;
 			m_rotation = sf::degrees(45);
 			return;
 		}
@@ -64,9 +64,9 @@ void Player::update(float dt)
 	else
 	{
 		// Calculate new landing position using delta X
-		float landingYpos = m_position.x + (m_origin.y - m_origin.x);
+		m_landingYPos = m_position.x + (m_origin.y - m_origin.x);
 
-		if (m_position.y < landingYpos) // Keep falling
+		if (m_position.y < m_landingYPos) // Keep falling
 		{
 			m_position.y += m_jumpSpeed * dt;
 		}
@@ -91,15 +91,14 @@ void Player::onJumpPressed()
 	if (m_isJumping)
 		return;
 
-	if (m_position.y <= 360 
-		&& m_position.y >= 340
+	if (m_position.y <=  m_landingYPos + 50.0f
+		&& m_position.y >= m_landingYPos - 50.0f
 		&& m_position.x < 1024)
 	{
 		if (m_onPlatform)
 		{
 			m_jumpSpeed = 1000;
 			m_jumpCeiling = 50;
-			m_onPlatform = false;
 			m_jumpDx = 400;
 		}
 		else
@@ -121,13 +120,10 @@ bool Player::checkRectCollision(const sf::RectangleShape& rect)
 	sf::Vector2f rectCenter = rect.getGlobalBounds().getCenter();
 
 	float distance = (this->m_position - rectCenter).lengthSquared();
-	float collisionDist = std::pow(Player::collisionRadius + PlatformHeight / 2, 2.0f);
+	float collisionDist = std::pow(Player::collisionRadius + 12.0f, 2.0f);
 	
 	if (distance <= collisionDist)
-	{
-		printf("on platform\n");
 		return true;
-	}
 
 	return false;
 }

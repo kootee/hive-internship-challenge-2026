@@ -65,7 +65,10 @@ Upload your work to Google Drive, Dropbox (or some other service), and complete 
 
 ## Your Game's Instructions
 
-Please include any instructions to your game here.
+Enjoy the endless snowy slide! 
+Use space to jump to avoid hitting the trees and survive for as long as you can.
+Try jumping at the ramps to get extra height to your jump!
+Good Luck!
 
 ## Troubleshooting
 
